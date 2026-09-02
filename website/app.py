@@ -114,8 +114,8 @@ def init_web_db():
     if c.fetchone()[0] == 0:
         default_lessons = [
             ("prog", "1. Python Asoslari va Muhitni Sozlash", "25 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Python dasturlash tilining sintaksisi, o'zgaruvchilar va ma'lumot turlari.", "Python-da 3 ta o'zgaruvchi yaratib konsolga chiqaring."),
-            ("prog", "2. Telegram Bot Yaratish: Telebot & Aiogram", "40 min", "https://www.w3schools.com/html/mov_bbb.mp4", "BotFather orqali bot tokenini olish, Tugmalar (Keyboards) bilan ishlash.", "Foydalanuvchidan kontakt so'raydigan bot yarating."),
-            ("prog", "3. Sun'iy Intellekt (AI) API Integratsiyasi", "35 min", "https://www.w3schools.com/html/mov_bbb.mp4", "OpenAI / Gemini API ulanishi, chat-botga intellektual javoblar qo'shish.", "Botga foydalanuvchi savoliga javob beruvchi funksiya yozing."),
+            ("prog", "2. Telegram Bot Yaratish: Telebot & Aiogram", "40 min", "https://www.w3schools.com/html/mov_bbb.mp4", "BotFather orqali bot tokenini olish, Tugmalar (Inline & Reply Keyboards) bilan ishlash.", "Foydalanuvchiga 3 ta tugma ko'rsatadigan Telegram bot kodini yozing."),
+            ("prog", "3. Sun'iy Intellekt (AI) API Integratsiyasi va Test", "35 min", "https://www.w3schools.com/html/mov_bbb.mp4", "OpenAI / Gemini API ulanishi, chat-botga intellektual javoblar va mini-testlar qo'shish.", "Botga foydalanuvchi savoliga javob beruvchi va test yuboruvchi funksiya yozing."),
             ("design", "1. Photoshop va Figma Asoslari", "30 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Dizayn instrumentlari, figuralar va qatlamlar bilan ishlash.", "Figma-da birinchi banner maketini chizing."),
             ("design", "2. Midjourney & DALL-E AI Vizualizatsiya", "45 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Prompt injeneriya, AI yordamida sifatli rasmlar generatsiya qilish.", "AI orqali Yuksak Academy uchun logotip varianti yarating."),
             ("3d", "1. SolidWorks 3D Modellashtirish va Injiniring", "50 min", "https://www.w3schools.com/html/mov_bbb.mp4", "SolidWorks 3D spetsifikatsiya, detallar yaratish va yig'ish.", "SolidWorks-da birinchi detal modelini tayyorlang."),
