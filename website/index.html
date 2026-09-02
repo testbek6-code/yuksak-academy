@@ -161,8 +161,8 @@
                     <div class="course-body-v3">
                         <h4 data-ru="3D Моделирование" data-uz="3D Modellashtirish" data-en="3D Modeling">3D Modellashtirish</h4>
                         <ul>
-                            <li data-ru="Интерьеры в 3ds Max" data-uz="3ds Max-da professional interyerlar" data-en="Professional 3ds Max interiors">3ds Max-da professional interyerlar</li>
-                            <li data-ru="Персонажи в Blender" data-uz="Blender dasturida 3D personajlar" data-en="3D characters in Blender">Blender dasturida 3D personajlar</li>
+                            <li data-ru="3D Моделирование в SolidWorks" data-uz="SolidWorks-da professional 3D modellashtirish" data-en="Professional 3D modeling in SolidWorks">SolidWorks-da professional 3D modellashtirish</li>
+                            <li data-ru="Персонажи и Анимация в Blender" data-uz="Blender dasturida 3D personajlar va animatsiya" data-en="3D characters and animation in Blender">Blender dasturida 3D personajlar va animatsiya</li>
                         </ul>
                         <div style="margin-top: 1rem; margin-bottom: 1rem;">
                             <button onclick="openCoursePlayer('3d')" class="btn-cyber-primary" style="padding: 0.7rem 1.2rem; font-size: 0.85rem;">🏗️ DARSGA KIRISH</button>
@@ -257,12 +257,12 @@
                 <p style="color: var(--text-muted); margin-top: 1rem; font-size: 1.05rem;" data-ru="Выбирайте удобный тариф и оплачивайте прямо на сайте." data-uz="O'zingizga qulay tarifni tanlang va to'lovni bevosita saytda amalga oshiring." data-en="Choose a convenient plan and pay directly on the website.">O'zingizga qulay tarifni tanlang va to'lovni bevosita saytda amalga oshiring.</p>
             </div>
 
-            <div class="tariff-grid">
+            <div class="tariff-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); max-width: 900px; margin: 0 auto;">
                 <!-- Standard tariff -->
                 <div class="cyber-deck" data-aos="fade-up">
                     <div class="cyber-deck-header">
                         <h3 data-ru="🥉 СТАНДАРТ" data-uz="🥉 STANDARD" data-en="🥉 STANDARD">🥉 STANDARD</h3>
-                        <div class="amount">60,000 <span>UZS</span></div>
+                        <div class="amount">100,000 <span>UZS</span></div>
                     </div>
                     <ul class="cyber-deck-features">
                         <li data-ru="Доступ к 1 выбранному курсу" data-uz="1 ta tanlangan kursga to'liq ulanish" data-en="Full access to 1 selected course">1 ta tanlangan kursga to'liq ulanish</li>
@@ -276,7 +276,7 @@
                 <div class="cyber-deck featured blue" data-aos="fade-up" data-aos-delay="100">
                     <div class="cyber-deck-header">
                         <h3 data-ru="🥈 ПЛАТИНА" data-uz="🥈 PLATINUM" data-en="🥈 PLATINUM">🥈 PLATINUM</h3>
-                        <div class="amount">120,000 <span>UZS</span></div>
+                        <div class="amount">199,000 <span>UZS</span></div>
                     </div>
                     <ul class="cyber-deck-features">
                         <li data-ru="Доступ к 2 любым курсам" data-uz="2 ta istalgan kursga ulanish" data-en="Access to 2 selected courses">2 ta istalgan kursga ulanish</li>
@@ -284,21 +284,6 @@
                         <li data-ru="Период активности: 1 месяц" data-uz="Foydalanish muddati: 1 oy" data-en="Access duration: 1 Month">Foydalanish muddati: 1 oy</li>
                     </ul>
                     <button onclick="openPaymentModal('platinum')" class="btn-cyber-primary btn-cyber-blue" data-ru="ОПЛАТИТЬ НА САЙТЕ" data-uz="SAYTDA TO'LASH" data-en="PAY ON WEBSITE">SAYTDA TO'LASH</button>
-                </div>
-
-                <!-- VIP tariff -->
-                <div class="cyber-deck vip" data-aos="fade-up" data-aos-delay="200">
-                    <div class="cyber-deck-header">
-                        <h3 data-ru="🥇 ВИП (1 Месяц)" data-uz="🥇 VIP (1 Oy)" data-en="🥇 VIP (1 Month)">🥇 VIP (1 Oy)</h3>
-                        <div class="amount">2,000,000 <span>UZS</span></div>
-                    </div>
-                    <ul class="cyber-deck-features">
-                        <li data-ru="Доступ ко всем курсам платформы" data-uz="Akademiyaning barcha kurslariga ulanish" data-en="Unlimited access to all courses">Akademiyaning barcha kurslariga ulanish</li>
-                        <li data-ru="5,000 интеллектуальных вопросов ИИ" data-uz="5,000 ta sun'iy intellekt (AI) savollari" data-en="5,000 AI assistant questions">5,000 ta sun'iy intellekt (AI) savollari</li>
-                        <li data-ru="Доступ ко всем новым курсам в будущем" data-uz="Kelajakdagi barcha yangi kurslarga ulanish" data-en="Access to all future new courses">Kelajakdagi barcha yangi kurslarga ulanish</li>
-                        <li data-ru="Период активности: 1 месяц" data-uz="Foydalanish muddati: 1 oy" data-en="Access duration: 1 Month">Foydalanish muddati: 1 oy</li>
-                    </ul>
-                    <button onclick="openPaymentModal('vip')" class="btn-cyber-primary btn-cyber-gold" data-ru="ОПЛАТИТЬ НА САЙТЕ" data-uz="SAYTDA TO'LASH" data-en="PAY ON WEBSITE">SAYTDA TO'LASH</button>
                 </div>
             </div>
         </div>

@@ -147,19 +147,19 @@ const terminalResponses = {
         uz: `YUKSAK ACADEMY KO'CHIRILGAN MODULLAR:\n` +
             `[MOD_01] Python & Telegram Botlar yaratish (IT)\n` +
             `[MOD_02] Dizayn & Sun'iy Intellekt (AI)\n` +
-            `[MOD_03] 3D Modellashtirish (Blender, 3ds Max)\n` +
+            `[MOD_03] 3D Modellashtirish (Blender, SolidWorks)\n` +
             `[MOD_04] Rus va Ingliz tillari akademiyasi\n` +
             `>> Barchasi faol. Telegram bot orqali ishlaydi.`,
         ru: `ЗАГРУЖЕННЫЕ МОДУЛИ YUKSAK ACADEMY:\n` +
             `[MOD_01] Python & Создание Telegram Ботов (IT)\n` +
             `[MOD_02] Дизайн & Искусственный Интеллект (AI)\n` +
-            `[MOD_03] 3D Моделирование (Blender, 3ds Max)\n` +
+            `[MOD_03] 3D Моделирование (Blender, SolidWorks)\n` +
             `[MOD_04] Академия Русского и Английского языков\n` +
             `>> Все модули АКТИВНЫ. Обучение проходит в Telegram боте.`,
         en: `LOADED MODULES YUKSAK ACADEMY:\n` +
             `[MOD_01] Python & Telegram Bot Creation (IT)\n` +
             `[MOD_02] Design & Artificial Intelligence (AI)\n` +
-            `[MOD_03] 3D Modeling (Blender, 3ds Max)\n` +
+            `[MOD_03] 3D Modeling (Blender, SolidWorks)\n` +
             `[MOD_04] Russian & English Language Academy\n` +
             `>> All modules online. Learning happens inside Telegram bot.`
     },
@@ -466,9 +466,8 @@ window.openPaymentModal = function(tariff) {
     const titleTag = document.getElementById('pay-modal-tariff-title');
     
     const tariffMap = {
-        'standard': 'STANDARD (60,000 UZS)',
-        'platinum': 'PLATINUM (120,000 UZS)',
-        'vip': 'VIP (2,000,000 UZS)'
+        'standard': 'STANDARD (100,000 UZS)',
+        'platinum': 'PLATINUM (199,000 UZS)'
     };
     if (titleTag) titleTag.textContent = tariffMap[tariff] || 'TARIF TO\'LOVI';
     if (modal) modal.classList.add('active');

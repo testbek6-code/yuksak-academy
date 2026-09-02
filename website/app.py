@@ -66,6 +66,21 @@ def get_db_connection():
         pass
     return conn
 
+# Background Keep-Alive thread to prevent Render free instance from sleeping
+import threading
+
+def keep_render_awake():
+    while True:
+        time.sleep(300) # Ping every 5 minutes
+        try:
+            url = os.environ.get("RENDER_EXTERNAL_URL", "https://yuksak-academy.onrender.com") + "/ping"
+            req = urllib.request.Request(url, headers={'User-Agent': 'KeepAlive/1.0'})
+            urllib.request.urlopen(req, timeout=10)
+        except Exception:
+            pass
+
+threading.Thread(target=keep_render_awake, daemon=True).start()
+
 def init_web_db():
     conn = get_db_connection()
     c = conn.cursor()
@@ -103,7 +118,8 @@ def init_web_db():
             ("prog", "3. Sun'iy Intellekt (AI) API Integratsiyasi", "35 min", "https://www.w3schools.com/html/mov_bbb.mp4", "OpenAI / Gemini API ulanishi, chat-botga intellektual javoblar qo'shish.", "Botga foydalanuvchi savoliga javob beruvchi funksiya yozing."),
             ("design", "1. Photoshop va Figma Asoslari", "30 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Dizayn instrumentlari, figuralar va qatlamlar bilan ishlash.", "Figma-da birinchi banner maketini chizing."),
             ("design", "2. Midjourney & DALL-E AI Vizualizatsiya", "45 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Prompt injeneriya, AI yordamida sifatli rasmlar generatsiya qilish.", "AI orqali Yuksak Academy uchun logotip varianti yarating."),
-            ("3d", "1. 3ds Max Interyer Modellashtirish", "50 min", "https://www.w3schools.com/html/mov_bbb.mp4", "3D spetsifikatsiya, obyektlar yaratish va teksturalash.", "3D xona modelini tayyorlang."),
+            ("3d", "1. SolidWorks 3D Modellashtirish va Injiniring", "50 min", "https://www.w3schools.com/html/mov_bbb.mp4", "SolidWorks 3D spetsifikatsiya, detallar yaratish va yig'ish.", "SolidWorks-da birinchi detal modelini tayyorlang."),
+            ("3d", "2. Blender 3D Personajlar va Aнимация", "45 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Blender dasturida 3D personajlar va 3D анимация yaratish.", "Blender-da 3D obyekt modelini tayyorlang."),
             ("lang", "1. Technical English for IT Specialists", "20 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Dasturlash terminologiyasi, muloqot va intervyu tayyorgarligi.", "O'zingiz haqida IT rezume uchun 5 ta jumla ingliz tilida yozing.")
         ]
         c.executemany("INSERT INTO lessons (course_id, title, duration, video_url, summary, assignment) VALUES (?,?,?,?,?,?)", default_lessons)
@@ -272,8 +288,13 @@ def api_submit_payment():
         "user": dict(user) if user else {}
     })
 
+@app.route('/ping')
+def ping():
+    return "OK", 200
+
 # Courses & Lessons Endpoint (Dynamic DB-backed)
 @app.route('/api/courses', methods=['GET'])
+@app.route('/api_courses', methods=['GET'])
 def api_courses():
     conn = get_db_connection()
     lessons_rows = conn.execute("SELECT * FROM lessons ORDER BY id ASC").fetchall()
@@ -282,7 +303,7 @@ def api_courses():
     courses_meta = {
         "prog": {"id": "prog", "title": "Dasturlash (IT)", "description": "Python, Telegram Botlar, Sun'iy Intellekt integratsiyasi va backend dasturlash.", "modules_count": 6},
         "design": {"id": "design", "title": "Dizayn & AI", "description": "Midjourney, ChatGPT, Canva va Figma orqali zamonaviy AI vizuallari va UX/UI loyihalar yaratish.", "modules_count": 5},
-        "3d": {"id": "3d", "title": "3D Modellashtirish", "description": "Blender va 3ds Max dasturlarida interyer va personajlar 3D modellarini yaratish.", "modules_count": 4},
+        "3d": {"id": "3d", "title": "3D Modellashtirish", "description": "Blender va SolidWorks dasturlarida 3D modellashtirish va muhandislik loyihalarini yaratish.", "modules_count": 4},
         "lang": {"id": "lang", "title": "Chet Tillari Akademiyasi", "description": "IT va biznes sohasida muvaffaqiyatga erishish uchun Rus va Ingliz tillari.", "modules_count": 8}
     }
     
@@ -363,17 +384,15 @@ def admin_panel():
     # Analytics & Chart breakdown metrics
     sub_standard = conn.execute("SELECT count(*) FROM users WHERE sub='standard'").fetchone()[0]
     sub_platinum = conn.execute("SELECT count(*) FROM users WHERE sub='platinum'").fetchone()[0]
-    sub_vip = conn.execute("SELECT count(*) FROM users WHERE sub='vip'").fetchone()[0]
     sub_free = conn.execute("SELECT count(*) FROM users WHERE sub='none' OR sub IS NULL").fetchone()[0]
     
     rev_standard = conn.execute("SELECT sum(amount) FROM payments WHERE tariff='standard'").fetchone()[0] or 0
     rev_platinum = conn.execute("SELECT sum(amount) FROM payments WHERE tariff='platinum'").fetchone()[0] or 0
-    rev_vip = conn.execute("SELECT sum(amount) FROM payments WHERE tariff='vip'").fetchone()[0] or 0
     
     conn.close()
     
-    chart_sub_data = [sub_standard, sub_platinum, sub_vip, sub_free]
-    chart_rev_data = [rev_standard, rev_platinum, rev_vip]
+    chart_sub_data = [sub_standard, sub_platinum, sub_free]
+    chart_rev_data = [rev_standard, rev_platinum]
     
     return render_template('admin.html', 
                            users_count=users_count, 
@@ -393,13 +412,13 @@ def grant_access():
     action = request.form.get('action')
     
     conn = get_db_connection()
-    if action in ['standard', 'platinum', 'vip']:
+    if action in ['standard', 'platinum']:
         expire_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() + 30 * 86400))
         conn.execute("UPDATE users SET sub=?, sub_expire=?, unlocked='[]', ai_count=0, step='main' WHERE id=?", (action, expire_date, user_id))
         
         u = conn.execute("SELECT phone FROM users WHERE id=?", (user_id,)).fetchone()
         phone = u['phone'] if u and u['phone'] else '-'
-        amount = 60000 if action == 'standard' else (120000 if action == 'platinum' else 2000000)
+        amount = 100000 if action == 'standard' else 199000
         pay_date = time.strftime('%Y-%m-%d %H:%M:%S')
         conn.execute("INSERT INTO payments (user_id, amount, date, phone, tariff) VALUES (?,?,?,?,?)", (user_id, amount, pay_date, phone, action))
     elif action == 'extra100':
