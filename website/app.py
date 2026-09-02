@@ -119,7 +119,6 @@ def init_web_db():
             ("design", "1. Photoshop va Figma Asoslari", "30 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Dizayn instrumentlari, figuralar va qatlamlar bilan ishlash.", "Figma-da birinchi banner maketini chizing."),
             ("design", "2. Midjourney & DALL-E AI Vizualizatsiya", "45 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Prompt injeneriya, AI yordamida sifatli rasmlar generatsiya qilish.", "AI orqali Yuksak Academy uchun logotip varianti yarating."),
             ("3d", "1. SolidWorks 3D Modellashtirish va Injiniring", "50 min", "https://www.w3schools.com/html/mov_bbb.mp4", "SolidWorks 3D spetsifikatsiya, detallar yaratish va yig'ish.", "SolidWorks-da birinchi detal modelini tayyorlang."),
-            ("3d", "2. Blender 3D Personajlar va Aнимация", "45 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Blender dasturida 3D personajlar va 3D анимация yaratish.", "Blender-da 3D obyekt modelini tayyorlang."),
             ("lang", "1. Technical English for IT Specialists", "20 min", "https://www.w3schools.com/html/mov_bbb.mp4", "Dasturlash terminologiyasi, muloqot va intervyu tayyorgarligi.", "O'zingiz haqida IT rezume uchun 5 ta jumla ingliz tilida yozing.")
         ]
         c.executemany("INSERT INTO lessons (course_id, title, duration, video_url, summary, assignment) VALUES (?,?,?,?,?,?)", default_lessons)
@@ -303,7 +302,7 @@ def api_courses():
     courses_meta = {
         "prog": {"id": "prog", "title": "Dasturlash (IT)", "description": "Python, Telegram Botlar, Sun'iy Intellekt integratsiyasi va backend dasturlash.", "modules_count": 6},
         "design": {"id": "design", "title": "Dizayn & AI", "description": "Midjourney, ChatGPT, Canva va Figma orqali zamonaviy AI vizuallari va UX/UI loyihalar yaratish.", "modules_count": 5},
-        "3d": {"id": "3d", "title": "3D Modellashtirish", "description": "Blender va SolidWorks dasturlarida 3D modellashtirish va muhandislik loyihalarini yaratish.", "modules_count": 4},
+        "3d": {"id": "3d", "title": "3D Modellashtirish (SolidWorks)", "description": "SolidWorks dasturida 3D modellashtirish va muhandislik loyihalarini yaratish.", "modules_count": 4},
         "lang": {"id": "lang", "title": "Chet Tillari Akademiyasi", "description": "IT va biznes sohasida muvaffaqiyatga erishish uchun Rus va Ingliz tillari.", "modules_count": 8}
     }
     
