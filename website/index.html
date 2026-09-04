@@ -255,7 +255,24 @@
                 <p style="color: var(--text-muted); margin-top: 1rem; font-size: 1.05rem;" data-ru="Выбирайте удобный тариф и оплачивайте прямо на сайте." data-uz="O'zingizga qulay tarifni tanlang va to'lovni bevosita saytda amalga oshiring." data-en="Choose a convenient plan and pay directly on the website.">O'zingizga qulay tarifni tanlang va to'lovni bevosita saytda amalga oshiring.</p>
             </div>
 
-            <div class="tariff-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); max-width: 900px; margin: 0 auto;">
+            <div class="tariff-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); max-width: 1100px; margin: 0 auto;">
+                <!-- Russian Level Test Tariff Card -->
+                <div class="cyber-deck" data-aos="fade-up" style="border-color: #c084fc;">
+                    <div class="cyber-deck-header">
+                        <h3 data-ru="📝 ТЕСТ РУССКОГО ЯЗЫКА" data-uz="📝 RUS TILI TESTI" data-en="📝 RUSSIAN TEST" style="color: #c084fc;">📝 RUS TILI TESTI</h3>
+                        <div class="amount" style="color: #c084fc;">20,000 <span>UZS</span></div>
+                    </div>
+                    <ul class="cyber-deck-features">
+                        <li data-ru="Тест определения уровня (A1-C1)" data-uz="Rus tili darajasini aniqlash (A1-C1)" data-en="Level assessment test (A1-C1)">Rus tili darajasini aniqlash (A1-C1)</li>
+                        <li data-ru="Инструкции и вопросы на узбекском" data-uz="Ko'rsatmalar va savollar o'zbek tilida" data-en="Uzbek questions and guidance">Ko'rsatmalar va savollar o'zbek tilida</li>
+                        <li data-ru="Результат и сертификат в кабинете" data-uz="Natija va daraja shaxsiy kabinetda" data-en="Instant profile certificate & level">Natija va daraja shaxsiy kabinetda</li>
+                    </ul>
+                    <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                        <button onclick="openPaymentModal('russian_test')" class="btn-cyber-primary" style="background: linear-gradient(135deg, #a855f7, #6b21a8); color: #fff;" data-ru="ОПЛАТИТЬ ТЕСТ (20k UZS)" data-uz="TEST UCHUN TO'LASH (20k)" data-en="PAY FOR TEST (20k UZS)">TEST UCHUN TO'LASH (20k)</button>
+                        <button onclick="startRussianPlacementTest()" class="btn-cyber-outline" style="border-color: #c084fc; color: #c084fc;" data-ru="📝 НАЧАТЬ ТЕСТ" data-uz="📝 TESTNI BOSHLASH" data-en="📝 START TEST">📝 TESTNI BOSHLASH</button>
+                    </div>
+                </div>
+
                 <!-- Standard tariff -->
                 <div class="cyber-deck" data-aos="fade-up">
                     <div class="cyber-deck-header">
@@ -387,6 +404,18 @@
                         <p style="font-size: 0.85rem; color: var(--text-muted);">TARIF HOLATI:</p>
                         <h4 id="prof-user-tariff" style="color: var(--primary); font-size: 1.3rem; margin-top: 0.2rem; font-family: var(--font-mono);">BEPUL (TARIFSIZ)</h4>
                     </div>
+
+                    <!-- Personal Cabinet Test Results -->
+                    <div style="margin-bottom: 1.5rem; text-align: left; background: rgba(2, 2, 4, 0.8); border: 1px solid rgba(192, 132, 252, 0.3); border-radius: 8px; padding: 1rem;">
+                        <h4 style="color: #c084fc; font-size: 0.9rem; font-family: var(--font-mono); margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+                            <span>📊 MENING TEST NATIJALARIM</span>
+                            <button onclick="startRussianPlacementTest()" class="btn-cyber-action" style="border-color: #c084fc; color: #c084fc; font-size: 0.7rem; padding: 0.2rem 0.5rem;">📝 QAYTA TOPSHIRISH</button>
+                        </h4>
+                        <div id="cabinet-test-results-list" style="max-height: 140px; overflow-y: auto; font-size: 0.82rem; color: #ddd;">
+                            <div style="color: var(--text-muted); text-align: center; padding: 0.5rem;">Test natijalari yo'q</div>
+                        </div>
+                    </div>
+
                     <div style="display: flex; gap: 1rem;">
                         <button onclick="scrollToPricing(); closeAuthModal();" class="btn-cyber-primary" style="flex: 1;">💎 TARIF OLISH</button>
                         <button onclick="handleLogout()" class="btn-cyber-outline" style="flex: 1; border-color: var(--accent); color: var(--accent);">CHIQISH</button>
@@ -394,6 +423,19 @@
                 </div>
 
                 <div id="auth-msg-box" style="margin-top: 1rem; font-size: 0.85rem; text-align: center;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Standalone Russian Placement Test Interactive Modal -->
+    <div id="russian-test-modal" class="cyber-modal">
+        <div class="cyber-modal-content" style="max-width: 650px;">
+            <div class="cyber-modal-header">
+                <h3 style="color: #c084fc;">🇷🇺 RUS TILI DARAJASINI ANIQLASH TESTI</h3>
+                <button class="cyber-modal-close" onclick="closeRussianTestModal()">&times;</button>
+            </div>
+            <div class="cyber-modal-body" id="russian-test-body">
+                <!-- Dynamic Quiz Screen rendered by JavaScript -->
             </div>
         </div>
     </div>

@@ -123,6 +123,48 @@ def init_web_db():
         ]
         c.executemany("INSERT INTO lessons (course_id, title, duration, video_url, summary, assignment) VALUES (?,?,?,?,?,?)", default_lessons)
 
+    # Create Russian level test tables
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS russian_test_questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question TEXT NOT NULL,
+            opt_a TEXT NOT NULL,
+            opt_b TEXT NOT NULL,
+            opt_c TEXT NOT NULL,
+            opt_d TEXT NOT NULL,
+            correct_opt INTEGER NOT NULL,
+            level TEXT DEFAULT 'A1'
+        )
+    """)
+
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS user_test_results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            score INTEGER NOT NULL,
+            total INTEGER NOT NULL,
+            percentage INTEGER NOT NULL,
+            level TEXT NOT NULL,
+            date TEXT NOT NULL
+        )
+    """)
+
+    c.execute("SELECT count(*) FROM russian_test_questions")
+    if c.fetchone()[0] == 0:
+        default_questions = [
+            ("«Привет, как тебя ...?» jumlada qaysi so'z tushirib qoldirilgan?", "зовут", "имя", "фамилия", "называют", 0, "A1"),
+            ("«Я ... в Ташкенте» — to'g'ri fe'l shaklini tanlang:", "живет", "живу", "жить", "живем", 1, "A1"),
+            ("«Сегодня очень ... погода» — mos sifatni tanlang:", "красивый", "хорошая", "теплый", "холодно", 1, "A1"),
+            ("«Мы ... русский язык каждый день»:", "учимся", "учить", "изучаем", "учит", 2, "A2"),
+            ("«Вчера я ... в библиотеку и взял книгу»:", "пошел", "иду", "ходил", "пойду", 0, "A2"),
+            ("«Если бы у меня было время, я бы ... эту книгу»:", "прочитал", "читаю", "прочитать", "буду читать", 0, "B1"),
+            ("«Несмотря на ... дождь, мы продолжим экскурсию»:", "сильный", "сильного", "сильному", "сильным", 0, "B1"),
+            ("«Он разговаривает так, будто ... всё на свете»:", "знает", "знал", "знать", "знающий", 0, "B2"),
+            ("«Соглашение было подписано вопреки ... некоторых участников»:", "сомнениям", "сомнений", "сомнения", "сомнениями", 0, "B2"),
+            ("«Дабы избежать недоразумений, следует заранее ... правила»:", "оговорить", "говорить", "разговаривать", "заговорить", 0, "C1")
+        ]
+        c.executemany("INSERT INTO russian_test_questions (question, opt_a, opt_b, opt_c, opt_d, correct_opt, level) VALUES (?,?,?,?,?,?,?)", default_questions)
+
     conn.commit()
     conn.close()
 
@@ -365,6 +407,108 @@ def admin_delete_lesson(lesson_id):
     conn.close()
     return redirect('/admin#lessons')
 
+# Russian Placement Level Test API Endpoints
+@app.route('/api/russian_test', methods=['GET'])
+def api_russian_test():
+    conn = get_db_connection()
+    rows = conn.execute("SELECT id, question, opt_a, opt_b, opt_c, opt_d, level FROM russian_test_questions ORDER BY id ASC").fetchall()
+    conn.close()
+    questions = [dict(r) for r in rows]
+    return jsonify({"success": True, "questions": questions})
+
+@app.route('/api/submit_russian_test', methods=['POST'])
+def api_submit_russian_test():
+    data = request.get_json(silent=True) or {}
+    user_id = data.get('user_id')
+    answers = data.get('answers', {}) # dict of q_id -> selected_opt_index
+    
+    if not user_id:
+        return jsonify({"error": "User ID missing"}), 400
+        
+    conn = get_db_connection()
+    questions = conn.execute("SELECT * FROM russian_test_questions ORDER BY id ASC").fetchall()
+    
+    total = len(questions)
+    score = 0
+    
+    for q in questions:
+        qid_str = str(q['id'])
+        if qid_str in answers and int(answers[qid_str]) == q['correct_opt']:
+            score += 1
+            
+    percentage = int((score / total) * 100) if total > 0 else 0
+    
+    if percentage >= 90:
+        level = "C1 (Mukammal / Профессиональный)"
+    elif percentage >= 75:
+        level = "B2 (Yuqori O'rta / Выше среднего)"
+    elif percentage >= 60:
+        level = "B1 (O'rta / Средний)"
+    elif percentage >= 40:
+        level = "A2 (Boshlang'ich II / Базовый)"
+    else:
+        level = "A1 (Boshlang'ich I / Начальный)"
+        
+    date_str = time.strftime('%Y-%m-%d %H:%M:%S')
+    conn.execute(
+        "INSERT INTO user_test_results (user_id, score, total, percentage, level, date) VALUES (?,?,?,?,?,?)",
+        (str(user_id), score, total, percentage, level, date_str)
+    )
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        "success": True,
+        "score": score,
+        "total": total,
+        "percentage": percentage,
+        "level": level,
+        "date": date_str
+    })
+
+@app.route('/api/my_test_results', methods=['POST'])
+def api_my_test_results():
+    data = request.get_json(silent=True) or {}
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({"error": "User ID missing"}), 400
+        
+    conn = get_db_connection()
+    results = conn.execute("SELECT * FROM user_test_results WHERE user_id=? ORDER BY id DESC", (str(user_id),)).fetchall()
+    conn.close()
+    return jsonify({"success": True, "results": [dict(r) for r in results]})
+
+@app.route('/admin/add_russian_test_question', methods=['POST'])
+@requires_auth
+def admin_add_russian_test_question():
+    question = request.form.get('question', '').strip()
+    opt_a = request.form.get('opt_a', '').strip()
+    opt_b = request.form.get('opt_b', '').strip()
+    opt_c = request.form.get('opt_c', '').strip()
+    opt_d = request.form.get('opt_d', '').strip()
+    correct_opt = int(request.form.get('correct_opt', 0))
+    level = request.form.get('level', 'A1').strip()
+    
+    if question and opt_a and opt_b and opt_c and opt_d:
+        conn = get_db_connection()
+        conn.execute(
+            "INSERT INTO russian_test_questions (question, opt_a, opt_b, opt_c, opt_d, correct_opt, level) VALUES (?,?,?,?,?,?,?)",
+            (question, opt_a, opt_b, opt_c, opt_d, correct_opt, level)
+        )
+        conn.commit()
+        conn.close()
+        
+    return redirect('/admin#russian-test')
+
+@app.route('/admin/delete_russian_test_question/<int:q_id>', methods=['POST'])
+@requires_auth
+def admin_delete_russian_test_question(q_id):
+    conn = get_db_connection()
+    conn.execute("DELETE FROM russian_test_questions WHERE id=?", (q_id,))
+    conn.commit()
+    conn.close()
+    return redirect('/admin#russian-test')
+
 @app.route('/admin')
 @requires_auth
 def admin_panel():
@@ -377,8 +521,16 @@ def admin_panel():
     users = conn.execute("SELECT * FROM users ORDER BY rowid DESC LIMIT 50").fetchall()
     extra_buyers = conn.execute("SELECT count(*) FROM users WHERE extra_ai > 0").fetchone()[0]
     
-    # Detailed lesson registry
+    # Detailed lesson registry & Russian level test questions & results
     all_lessons = conn.execute("SELECT * FROM lessons ORDER BY id DESC").fetchall()
+    test_questions = conn.execute("SELECT * FROM russian_test_questions ORDER BY id ASC").fetchall()
+    
+    test_results_raw = conn.execute("""
+        SELECT r.*, u.name, u.phone 
+        FROM user_test_results r 
+        LEFT JOIN users u ON r.user_id = u.id 
+        ORDER BY r.id DESC LIMIT 100
+    """).fetchall()
     
     # Analytics & Chart breakdown metrics
     sub_standard = conn.execute("SELECT count(*) FROM users WHERE sub='standard'").fetchone()[0]
@@ -401,6 +553,8 @@ def admin_panel():
                            users=users,
                            extra_buyers=extra_buyers,
                            lessons=all_lessons,
+                           test_questions=test_questions,
+                           test_results=test_results_raw,
                            chart_sub_data=chart_sub_data,
                            chart_rev_data=chart_rev_data)
 
@@ -411,13 +565,19 @@ def grant_access():
     action = request.form.get('action')
     
     conn = get_db_connection()
-    if action in ['standard', 'platinum']:
+    if action in ['standard', 'platinum', 'russian_test']:
         expire_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() + 30 * 86400))
         conn.execute("UPDATE users SET sub=?, sub_expire=?, unlocked='[]', ai_count=0, step='main' WHERE id=?", (action, expire_date, user_id))
         
         u = conn.execute("SELECT phone FROM users WHERE id=?", (user_id,)).fetchone()
         phone = u['phone'] if u and u['phone'] else '-'
-        amount = 100000 if action == 'standard' else 199000
+        if action == 'russian_test':
+            amount = 20000
+        elif action == 'standard':
+            amount = 100000
+        else:
+            amount = 199000
+            
         pay_date = time.strftime('%Y-%m-%d %H:%M:%S')
         conn.execute("INSERT INTO payments (user_id, amount, date, phone, tariff) VALUES (?,?,?,?,?)", (user_id, amount, pay_date, phone, action))
     elif action == 'extra100':

@@ -496,6 +496,122 @@
             </div>
         </div>
 
+        <!-- Russian Placement Level Test Manager & Results Section -->
+        <div class="data-section-cyber" id="russian-test" style="border-color: rgba(192, 132, 252, 0.4);">
+            <h3 style="color: #c084fc;">🇷🇺 ТЕСТИРОВАНИЕ РУССКОГО ЯЗЫКА (20,000 UZS)</h3>
+            
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                <!-- Add Question Form -->
+                <div style="flex: 1; min-width: 320px; background: rgba(2, 2, 4, 0.8); border: 1px solid rgba(192, 132, 252, 0.3); border-radius: 10px; padding: 1.5rem;">
+                    <h4 style="color: #c084fc; font-family: var(--font-mono); margin-bottom: 1.2rem;">➕ ДОБАВИТЬ ВОПРОС ТЕСТА</h4>
+                    
+                    <form action="/admin/add_russian_test_question" method="POST">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.8rem; font-family: var(--font-mono); margin-bottom: 0.3rem;">УРОВЕНЬ СЛОЖНОСТИ:</label>
+                            <select name="level" class="cyber-select" style="width: 100%; padding: 0.7rem;">
+                                <option value="A1">A1 (Начальный I)</option>
+                                <option value="A2">A2 (Базовый II)</option>
+                                <option value="B1">B1 (Средний)</option>
+                                <option value="B2">B2 (Выше среднего)</option>
+                                <option value="C1">C1 (Продвинутый)</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.8rem; font-family: var(--font-mono); margin-bottom: 0.3rem;">ТЕКСТ ВОПРОСА (на узбекском / с цитатой):</label>
+                            <textarea name="question" rows="2" placeholder="например: «Я ... в Ташкенте» — to'g'ri fe'l shaklini tanlang:" required class="cyber-input" style="resize: vertical;"></textarea>
+                        </div>
+
+                        <div style="grid-template-columns: 1fr 1fr; display: grid; gap: 0.8rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="color: var(--text-muted); font-size: 0.75rem;">ВАРИАНТ A:</label>
+                                <input type="text" name="opt_a" placeholder="Ответ A" required class="cyber-input">
+                            </div>
+                            <div>
+                                <label style="color: var(--text-muted); font-size: 0.75rem;">ВАРИАНТ B:</label>
+                                <input type="text" name="opt_b" placeholder="Ответ B" required class="cyber-input">
+                            </div>
+                            <div>
+                                <label style="color: var(--text-muted); font-size: 0.75rem;">ВАРИАНТ C:</label>
+                                <input type="text" name="opt_c" placeholder="Ответ C" required class="cyber-input">
+                            </div>
+                            <div>
+                                <label style="color: var(--text-muted); font-size: 0.75rem;">ВАРИАНТ D:</label>
+                                <input type="text" name="opt_d" placeholder="Ответ D" required class="cyber-input">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.8rem; font-family: var(--font-mono); margin-bottom: 0.3rem;">ПРАВИЛЬНЫЙ ВАРИАНТ:</label>
+                            <select name="correct_opt" class="cyber-select" style="width: 100%; padding: 0.7rem;">
+                                <option value="0">Вариант A</option>
+                                <option value="1">Вариант B</option>
+                                <option value="2">Вариант C</option>
+                                <option value="3">Вариант D</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-cyber-primary" style="background: linear-gradient(135deg, #a855f7, #6b21a8); border-color: #c084fc; color: #fff;">💾 СОХРАНИТЬ ВОПРОС</button>
+                    </form>
+                </div>
+
+                <!-- Existing Questions Registry -->
+                <div style="flex: 2; min-width: 320px; background: rgba(2, 2, 4, 0.8); border: 1px solid rgba(192, 132, 252, 0.3); border-radius: 10px; padding: 1.5rem; max-height: 420px; overflow-y: auto;">
+                    <h4 style="color: #c084fc; font-family: var(--font-mono); margin-bottom: 1.2rem;">📝 БАЗА ВОПРОСОВ ({{ test_questions|length }})</h4>
+                    
+                    {% for q in test_questions %}
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1; padding-right: 1rem;">
+                            <span class="cyber-badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #c084fc; font-size: 0.7rem;">{{ q.level }}</span>
+                            <strong style="color: #fff; font-size: 0.9rem; margin-left: 0.5rem;">{{ q.question }}</strong>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">
+                                A) {{ q.opt_a }} | B) {{ q.opt_b }} | C) {{ q.opt_c }} | D) {{ q.opt_d }}
+                            </div>
+                        </div>
+                        <form action="/admin/delete_russian_test_question/{{ q.id }}" method="POST" style="margin:0;">
+                            <button type="submit" class="btn-cyber-action reject" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="return confirm('Удалить этот вопрос?');">🗑️ Удалить</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Student Results Monitoring Table -->
+            <h4 style="color: #c084fc; font-family: var(--font-mono); margin-top: 2rem; margin-bottom: 1rem;">📊 РЕЗУЛЬТАТЫ СТУДЕНТОВ</h4>
+            <div class="table-responsive">
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Студент</th>
+                            <th>Телефон</th>
+                            <th>Балл</th>
+                            <th>Процент</th>
+                            <th>Определенный Уровень</th>
+                            <th>Дата и Время</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in test_results %}
+                        <tr>
+                            <td>#{{ r.id }}</td>
+                            <td><strong style="color: #fff;">{{ r.name or r.user_id }}</strong></td>
+                            <td style="font-family: var(--font-mono); color: var(--secondary);">{{ r.phone or '-' }}</td>
+                            <td><strong style="color: var(--primary);">{{ r.score }} / {{ r.total }}</strong></td>
+                            <td>{{ r.percentage }}%</td>
+                            <td><span class="cyber-badge" style="background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid #c084fc;">{{ r.level }}</span></td>
+                            <td style="color: var(--text-muted); font-size: 0.8rem;">{{ r.date }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: var(--text-muted);">Пока нет результатов прохождения тестов.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Pending Receipts Section -->
         <div class="data-section-cyber" id="receipts">
             <h3>🆕 Проверка Чеков и Оплат (Ожидают подтверждения)</h3>

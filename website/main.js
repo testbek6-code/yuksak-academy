@@ -692,3 +692,136 @@ window.sendWebAiQuery = async function() {
 };
 
 console.log('YUKSAK ACADEMY Cyber-Deck Loaded.');
+
+// -------------------------------------------------------------
+// Russian Placement Level Test Interactive Engine
+// -------------------------------------------------------------
+let currentTestQuestions = [];
+let currentTestAnswers = {};
+let currentQuestionIndex = 0;
+
+window.startRussianPlacementTest = async function() {
+    if (!currentUser) {
+        alert("Test topshirish uchun avval tizimga kiring yoki ro'yxatdan o'ting!");
+        openAuthModal();
+        return;
+    }
+    
+    const modal = document.getElementById('russian-test-modal');
+    const body = document.getElementById('russian-test-body');
+    if (!modal || !body) return;
+    
+    modal.classList.add('active');
+    body.innerHTML = '<div style="text-align: center; padding: 2rem; color: #c084fc;">⏳ Test savollari yuklanmoqda...</div>';
+    
+    try {
+        const res = await fetch('/api/russian_test');
+        const data = await res.json();
+        if (data.success && data.questions && data.questions.length > 0) {
+            currentTestQuestions = data.questions;
+            currentTestAnswers = {};
+            currentQuestionIndex = 0;
+            renderRussianTestQuestion();
+        } else {
+            body.innerHTML = '<div style="color: var(--accent); text-align: center;">Hozircha test savollari mavjud emas.</div>';
+        }
+    } catch(e) {
+        body.innerHTML = '<div style="color: var(--accent); text-align: center;">Server bilan ulanishda xatolik.</div>';
+    }
+};
+
+window.closeRussianTestModal = function() {
+    const modal = document.getElementById('russian-test-modal');
+    if (modal) modal.classList.remove('active');
+};
+
+function renderRussianTestQuestion() {
+    const body = document.getElementById('russian-test-body');
+    if (!body || currentTestQuestions.length === 0) return;
+    
+    const q = currentTestQuestions[currentQuestionIndex];
+    const total = currentTestQuestions.length;
+    const progress = Math.round(((currentQuestionIndex + 1) / total) * 100);
+    
+    body.innerHTML = `
+        <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted);">
+            <span>SAVOL ${currentQuestionIndex + 1} / ${total}</span>
+            <span style="color: #c084fc; font-weight: bold;">Daraja: ${q.level}</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); height: 6px; border-radius: 3px; margin-bottom: 1.5rem; overflow: hidden;">
+            <div style="background: #c084fc; width: ${progress}%; height: 100%; transition: width 0.3s;"></div>
+        </div>
+        <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.4;">${q.question}</h3>
+        <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem;">
+            ${[q.opt_a, q.opt_b, q.opt_c, q.opt_d].map((opt, i) => `
+                <button onclick="selectRussianTestOption(${q.id}, ${i})" 
+                        class="btn-cyber-outline" 
+                        style="text-align: left; padding: 0.8rem 1rem; border-color: ${currentTestAnswers[q.id] === i ? '#c084fc' : 'rgba(255,255,255,0.2)'}; background: ${currentTestAnswers[q.id] === i ? 'rgba(192, 132, 252, 0.15)' : 'transparent'}; color: ${currentTestAnswers[q.id] === i ? '#c084fc' : '#fff'};">
+                    <strong>${String.fromCharCode(65 + i)})</strong> ${opt}
+                </button>
+            `).join('')}
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <button onclick="prevRussianQuestion()" class="btn-cyber-outline" style="border-color: var(--text-muted); color: var(--text-muted);" ${currentQuestionIndex === 0 ? 'disabled' : ''}>⬅️ Oldingisi</button>
+            ${currentQuestionIndex === total - 1 ? 
+                `<button onclick="submitRussianPlacementTest()" class="btn-cyber-primary" style="background: #c084fc; color: #000;">✅ TESTNI YAKUNLASH</button>` : 
+                `<button onclick="nextRussianQuestion()" class="btn-cyber-primary" style="background: linear-gradient(135deg, #a855f7, #6b21a8);">Keyingisi ➡️</button>`
+            }
+        </div>
+    `;
+}
+
+window.selectRussianTestOption = function(qid, optIndex) {
+    currentTestAnswers[qid] = optIndex;
+    renderRussianTestQuestion();
+};
+
+window.nextRussianQuestion = function() {
+    if (currentQuestionIndex < currentTestQuestions.length - 1) {
+        currentQuestionIndex++;
+        renderRussianTestQuestion();
+    }
+};
+
+window.prevRussianQuestion = function() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderRussianTestQuestion();
+    }
+};
+
+window.submitRussianPlacementTest = async function() {
+    const body = document.getElementById('russian-test-body');
+    if (!body || !currentUser) return;
+    
+    body.innerHTML = '<div style="text-align: center; padding: 2rem; color: #c084fc;">⏳ Natijangiz hisoblanmoqda...</div>';
+    
+    try {
+        const res = await fetch('/api/submit_russian_test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: currentUser.id, answers: currentTestAnswers })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            body.innerHTML = `
+                <div style="text-align: center; padding: 1.5rem 0;">
+                    <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🎉</div>
+                    <h2 style="color: #c084fc; font-size: 1.5rem; margin-bottom: 0.5rem;">TEST YAKUNLANDI!</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Sizning Rus tili bilish darajangiz:</p>
+                    <div style="margin: 1.5rem 0; padding: 1.2rem; background: rgba(192, 132, 252, 0.1); border: 2px solid #c084fc; border-radius: 12px;">
+                        <h3 style="color: #fff; font-size: 1.4rem;">${data.level}</h3>
+                        <p style="color: var(--primary); font-family: var(--font-mono); margin-top: 0.5rem; font-size: 1.1rem; font-weight: bold;">Natija: ${data.score} / ${data.total} (${data.percentage}%)</p>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 1.5rem;">Ushbu natija shaxsiy kabinetingizda saqlandi.</p>
+                    <button onclick="closeRussianTestModal(); openAuthModal();" class="btn-cyber-primary" style="background: #c084fc; color: #000;">👤 SHAXSIY KABINETGA O'TISH</button>
+                </div>
+            `;
+        } else {
+            body.innerHTML = `<div style="color: var(--accent); text-align: center;">Xato: ${data.error || 'Natijani hisoblab bo\'lmadi'}</div>`;
+        }
+    } catch(e) {
+        body.innerHTML = '<div style="color: var(--accent); text-align: center;">Natijani yuborishda server xatosi.</div>';
+    }
+};
